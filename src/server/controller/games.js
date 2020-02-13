@@ -41,6 +41,13 @@ function connectPlayer(socket, data) {
         }
     });
 
+	/*
+	 * Broadcast to all room
+	*/
+	socket.on('broadcast send', (data, callback) => {
+		socket.to(data.room).emit('broadcast received', data);
+	});
+
     /*
      * Sets the time between each move aka the interval
      * Emits interval to all players in the room
