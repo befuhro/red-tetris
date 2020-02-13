@@ -80,8 +80,7 @@ function connectPlayer(socket, data) {
     });
 
     /*
-    * Fires when a piece has been placed, add pieces when there is not a lot
-    * TODO: When 30 pieces have been placed, eliminate one player and restart 
+    * Fires when a piece has been placed, add pieces when there is not enough 
     */
     socket.on('piece placed', (spectrum, callback) => {
         let score = 0;
@@ -94,20 +93,30 @@ function connectPlayer(socket, data) {
 			let spectrum = games[data.room].players[data.username].spectrum;
 			score = spectrum.length;
 			spectrum.forEach((line) => {
-				let is_empty = line.reduce((accumulator, value) => {accumulator + value}) != 0;
-				if (!is_empty) {
+				if (line.reduce((accumulator, value) => {accumulator + value}) != 0) {
 					score--;
 				}
 			});
 			if (games[data.room].players[data.username].pieces_placed == 30) {
-				callback({score: score});
+				let worst_user = {score: 0, user: null};
+				Object.values(games[data.room].players).forEach((player) => {
+					if (worst_user.score > player.score) {
+						worst_user.score = player.score;
+
+					}
+				});
+				if (worst_user.user == data.username) {
+					games[data.room].players[data.username].ended = true;
+					callback({score: score, ended: true, message: 'Wave ended, you got left begin and got disqualified...'});
+					return;
+				}
+				callback({score: score, ended:false, message: 'Wave ended, waiting for other players...'});
 				return;	
 			}
 		}
 		if (games[data.room].Pieces.length <= 5)
 			games[data.room].addPiece(5);
-
-        callback({score: score});
+        callback({score: score, ended: false});
     });
 
     /*
