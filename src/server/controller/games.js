@@ -78,15 +78,6 @@ function connectPlayer(socket, data) {
         callback({end: true, score: game[data.room].players[data.username].score});
     });
 
-    /*
-     * Must see if not better to emit interval instead of getting it
-     * Returns the time between each move
-    */
-    // socket.on('get interval', (callback) => {
-    //     callback({interval: games[data.room].interval});
-    // });
-
-
     // Broadcast when a opponent joins the room.
     socket.to(data.room).emit('opponent connection', {
         players: games[data.room].getPlayersInfo(),

@@ -43,8 +43,9 @@ class Game {
     }
 	
 	setInterval(value) {
-		if (value > 0 && value < 10)
+		if (value > 0 && value <= 1000) {
 			this.interval = value;
+		}
 	}
 
     getPlayersInfo() {
