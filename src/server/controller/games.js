@@ -18,10 +18,6 @@ function connectPlayer(socket, data) {
         }
     });
 
-    socket.on('update spectrum', (spectrum) => {
-        games[data.room].players[data.username].updateSpectrum(spectrum);
-    });
-
     // Handle pieces fetching
     socket.on('fetch pieces', (from, callback) => {
         console.log('fetching pieces from ' + from);
@@ -32,14 +28,30 @@ function connectPlayer(socket, data) {
     socket.on('start party', (callback) => {
         if (socket.id === Object.values(games[data.room].players)[0].socket.id) {
             console.log('game of room ' + data.room + ' has now started');
-            callback({authorizedToLaunchParty: true});
             games[data.room].gameIsStarted = true;
+            callback({authorizedToLaunchParty: true});
             socket.to(data.room).emit('launch party');
         } else {
             console.log('could not launch game of room ' + data.room);
             callback({authorizedToLaunchParty: false});
         }
     });
+
+	/*
+	 * Set a game mode, 'normal', 'sudden death'
+	*/
+	socket.on('mode set', (mode, callback) => {
+        if (socket.id === Object.values(games[data.room].players)[0].socket.id) {
+			if (Object.keys(games[data.room].players).length < 2) {
+				callback({authorized: true, error: 'The room needs at least 2 players'});
+				return;
+			}
+			games[data.room].mode = mode;
+			callback({authorized: true});
+		} else {
+			callback({authorized: false, error: 'You are not the party leader'});
+		}
+	});
 
 	/*
 	 * Broadcast to all room
@@ -68,12 +80,34 @@ function connectPlayer(socket, data) {
     });
 
     /*
-    * Must see how we handle score
-    * Fires when a piece has been placed
+    * Fires when a piece has been placed, add pieces when there is not a lot
+    * TODO: When 30 pieces have been placed, eliminate one player and restart 
     */
-    socket.on('piece placed', (piece_num, callback) => {
-        let score = game[data.room].players[data.username].score++;
-        callback({score: game[data.room].players[data.username].score});
+    socket.on('piece placed', (spectrum, callback) => {
+        let score = 0;
+		games[data.room].players[data.username].updateSpectrum(spectrum);
+		games[data.room].players[data.username].pieces_placed++;
+        if (games[data.room].mode == 'normal') {
+			score = games[data.room].players[data.username].score++;
+		}
+		else if (games[data.room].mode == 'sudden death') {
+			let spectrum = games[data.room].players[data.username].spectrum;
+			score = spectrum.length;
+			spectrum.forEach((line) => {
+				let is_empty = line.reduce((accumulator, value) => {accumulator + value}) != 0;
+				if (!is_empty) {
+					score--;
+				}
+			});
+			if (games[data.room].players[data.username].pieces_placed == 30) {
+				callback({score: score});
+				return;	
+			}
+		}
+		if (games[data.room].Pieces.length <= 5)
+			games[data.room].addPiece(5);
+
+        callback({score: score});
     });
 
     /*

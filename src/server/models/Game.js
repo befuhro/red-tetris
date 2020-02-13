@@ -5,12 +5,12 @@ const Player = require("../models/Player");
 class Game {
     constructor(name, leaderName) {
         this.name = name;
-        this.players = {};
+        this.mode = 'normal';
+		this.players = {};
         this.leaderName = leaderName;
         this.Pieces = [];
         this.gameIsStarted = false;
         this.interval = 250;
-		this.addPieces(10);
     }
 
     addPiece() {
@@ -25,8 +25,8 @@ class Game {
     }
 
     fetchPieces(from) {
-        if (from + 10 >= this.Pieces.length) {
-            this.addPieces(5);
+        if (from + 5 >= this.Pieces.length) {
+			return (null);
         }
         return (this.Pieces.slice(from, from + 5));
     }
