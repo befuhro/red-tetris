@@ -58,6 +58,7 @@ function connectPlayer(socket, data) {
 	*/
 	socket.on('broadcast send', (data, callback) => {
 		socket.to(data.room).emit('broadcast received', data);
+		callback(data);
 	});
 
     /*
@@ -98,20 +99,30 @@ function connectPlayer(socket, data) {
 				}
 			});
 			if (games[data.room].players[data.username].pieces_placed == 30) {
-				let worst_user = {score: 0, user: null};
+				callback({score: score, ended:false, message: 'Wave ended, waiting for other players...'});
+				return;
+			}
+			let new_wave = true;
+			Object.values(game[data.room].players).forEach((player) => {
+				if (player.pieces_placed != 30) {
+					new_wave = false;
+				}
+			})
+			if (new_wave) {
+				let worst_user = {score: 99999999, user: null};
 				Object.values(games[data.room].players).forEach((player) => {
-					if (worst_user.score > player.score) {
+					if (worst_user.ended === false && worst_user.score > player.score) {
 						worst_user.score = player.score;
-
 					}
 				});
-				if (worst_user.user == data.username) {
+				if (worst_user.user === data.username) {
 					games[data.room].players[data.username].ended = true;
+					console.log("Player " + player.username + " is eliminated");
 					callback({score: score, ended: true, message: 'Wave ended, you got left begin and got disqualified...'});
-					return;
 				}
-				callback({score: score, ended:false, message: 'Wave ended, waiting for other players...'});
-				return;	
+				Object.values(games[data.room].players).forEach((player) => {
+					player.pieces_placed = 0;
+				}
 			}
 		}
 		if (games[data.room].Pieces.length <= 5)
