@@ -61,6 +61,27 @@ function connectPlayer(socket, data) {
 		callback(data);
 	});
 
+
+	/*
+	 * Gets if a player has lost, if no player left set the game as over
+	*/
+	socket.on('player ended', (callback)) => {
+		games[data.room].players[data.username].ended = true;
+		ended = true;
+		console.log(username + " has ended");
+		socket.to(data.room).emit('player ended', data.username);
+		Object.values(game[data.room].players).forEach((player) => {
+			if (player.ended === false) {
+				ended = false;
+			}
+		}
+		console.log("game " + data.room + " is over");
+		if (ended) {
+			socket.to(data.room).emit("game over");
+		}
+		callback({gameover: ended});
+	}
+
     /*
      * Sets the time between each move aka the interval
      * Emits interval to all players in the room
