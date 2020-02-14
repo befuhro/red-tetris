@@ -9,7 +9,8 @@ class Game {
 		this.players = {};
         this.leaderName = leaderName;
         this.Pieces = [];
-        this.gameIsStarted = false;
+		this.addPieces(10);
+		this.gameIsStarted = false;
         this.interval = 250;
     }
 
