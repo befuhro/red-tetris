@@ -1,15 +1,12 @@
-import cloneDeep from "lodash/cloneDeep";
+import clone from "lodash/clone";
 
 export const putCurrentToBoard = (board, current) => {
-    if (current !== null) {
-        let newBoard = cloneDeep(board);
-        current.position.forEach((pos) => {
-            newBoard[pos.row * 10 + pos.column].color = current.color;
-        });
+    if (current) {
+        let newBoard = clone(board);
+        current.position.forEach((pos) => newBoard[pos.row * 10 + pos.column].color = current.color);
         return (newBoard);
-    } else {
-        return (board);
     }
+    return (board);
 };
 
 export const getUncompletedRows = (board) => {
@@ -31,13 +28,12 @@ export const getUncompletedRows = (board) => {
 
 export const createShiftingArray = (uncompletedRows) => {
     let array = Array(20).fill({}).map(function (x, index) {
-        return({index: 19 - index, shiftWith: -1});
+        return ({index: 19 - index, shiftWith: -1});
     });
     uncompletedRows.forEach((uncompletedRow, index) => {
         if (uncompletedRow !== array[index].index) {
             array[index].shiftWith = uncompletedRow;
-        }
-        else {
+        } else {
             array[index].shiftWith = array[index].index;
         }
     });
@@ -50,8 +46,7 @@ export const emptyCompleteRows = (shiftingArray, board) => {
         const shiftWith = shiftingArray[19 - square.row].shiftWith;
         if (square.row !== shiftWith && shiftWith !== -1) {
             square.color = board[((20 - shiftWith) * 10) - square.column - 1].color;
-        }
-        else if (shiftWith === - 1) {
+        } else if (shiftWith === -1) {
             square.color = "white";
         }
         return (square);
