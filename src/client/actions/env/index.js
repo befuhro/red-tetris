@@ -8,7 +8,7 @@ export const checkAvailability = (username, room) => {
             socket.emit('check availability', {username: username, room: room}, (data) => {
                 if (data['canConnect'] === true) {
                     let url = window.location.href.split(':',2).join(':');
-                    window.location.href = url + ":3000/#" + room + "[" + username + "]";
+                    window.location.href = url + ":8080/#" + room + "[" + username + "]";
                 }
                 else {
                     dispatch(checkAvailabilityFailure(data['reasons']));
