@@ -1,3 +1,5 @@
+import io from "socket.io-client";
+
 import {updateRoom, askPiece, updateSpectrum, changeInterval} from "../actions/room";
 
 export const roomConnection = (socket, dispatch) => {
