@@ -4,7 +4,7 @@ export const rotatePiece = (state) => {
         return {
             ...state,
             current: {
-                ...current,
+                ...state.current,
                 indexRotation: state.current.indexRotation < 4 ? state.current.indexRotation + 1 : 1,
                 lastMove: Math.floor(Date.now() / 100),
                 position: state.current.position.map((position, index) => ({
