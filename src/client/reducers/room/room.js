@@ -1,33 +1,20 @@
-import clone from "lodash/clone";
+export const joinRoomSuccess = (state, action) => ({
+    ...state,
+    username: action.username,
+    room: action.room,
+    socket: action.socket,
+    players: action.players,
+    isRoomLeader: action.isRoomLeader
+});
 
-export const joinRoomSuccess = (state, action) => {
-    let newState = clone(state);
-
-    newState.username = action.username;
-    newState.room = action.room;
-    newState.socket = action.socket;
-    newState.players = action.players;
-    newState.isRoomLeader = action.isRoomLeader;
-    return (newState);
-};
-
-export const joinRoomFailure = (state, action) => {
-    let newState = clone(state);
-
-    newState.errors = action.errors;
-    return (newState);
-};
+export const joinRoomFailure = (state, action) => ({ ...state, errors: action.errors });
 
 export const updateRoom = (state, action) => {
-    let newState = clone(state);
-
-
-    newState.players = action.players;
-    if (newState.players[state.username]) {
-        delete newState.players[state.username];
-    }
-    if (action.leaderName === state.username) {
-        newState.isRoomLeader = true;
-    }
-    return (newState);
+    const players = action.players;
+    if (players[state.username]) delete players[state.username];
+    return {
+        ...state,
+        isRoomLeader: action.leaderName === state.username ? true : null,
+        players: players
+    };
 };

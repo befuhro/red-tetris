@@ -20,7 +20,6 @@ const movePieceMiddleware = store => next => action => {
                 store.dispatch(askPiece());
             }
         }
-    } else if (action.type === MOVE_PIECE && store.getState().room.current === null) {
     } else {
         next(action);
     }

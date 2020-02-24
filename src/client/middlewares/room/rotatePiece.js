@@ -8,15 +8,12 @@ const rotatePieceMiddleware = store => next => action => {
         const position = store.getState().room.current.position;
         const indexRotation = store.getState().room.current.indexRotation - 1;
         const rotation = store.getState().room.current.rotation[indexRotation];
-        let newPosition = position.map((pos, index) => {
-            return ({column: pos.column + rotation[index].column, row: pos.row + rotation[index].row});
-        });
+        let newPosition = position.map((pos, index) => ({column: pos.column + rotation[index].column, row: pos.row + rotation[index].row}));
         const error = checkNewPosition(position, newPosition, board, "rotate");
         if (error === true) {
             next(action);
         }
         else {
-            console.log(error);
             if (error.side === LEFT) {
                 next(movePiece(RIGHT));
             }
@@ -35,7 +32,6 @@ const rotatePieceMiddleware = store => next => action => {
             rotatePieceMiddleware(store)(next)(action);
         }
     }
-    else if (action.type === ROTATE_PIECE && store.getState().room.current === null) {}
     else {
         next(action);
     }

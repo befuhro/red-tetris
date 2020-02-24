@@ -2,7 +2,7 @@ import clone from "lodash/clone";
 import {putCurrentToBoard} from "../../utils/newPiece";
 import {getCompleteLines, removeCompleteLines} from "../../utils/removeCompleteLines";
 
-const updateSpectrum = (socket, board) => {
+const createSpectrum = (board) => {
     let spectrum = [];
     board.forEach((bloc, index) => {
         const row = Math.floor(index / 10);
@@ -14,6 +14,11 @@ const updateSpectrum = (socket, board) => {
             spectrum[row][column] = 1;
         }
     });
+    return spectrum
+};
+
+const updateSpectrum = (socket, board) => {
+    const spectrum = createSpectrum(board);
     socket.emit('update spectrum', spectrum);
 };
 
@@ -21,7 +26,7 @@ export const getPiece = (state) => {
     const piece = state.pieces[0];
     let newState = clone(state);
     newState.board = putCurrentToBoard(state.board, state.current);
-    // Remove completed lines
+    // Remove complete lines
     const completeLines = getCompleteLines(state.board);
     if (completeLines.length !== 0) {
         newState.board = removeCompleteLines(state.board, completeLines);

@@ -20,7 +20,7 @@ import {fetchPieces} from "./fetchPieces";
 import {updateSpectrum} from "./spectrum";
 import {changeInterval} from "./changeInterval";
 
-const initialState = () => ({
+export const initialState = () => ({
     board: Array(200).fill({color: "white"}).map((square, index) => (
         {...square, ...{row: Math.floor(index / 10), column: index % 10}})),
     current: null,
