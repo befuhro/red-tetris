@@ -3,7 +3,7 @@ import { movePiece, ROTATE_PIECE } from "../../actions/room";
 import { TOP, BOTTOM, LEFT, RIGHT, ALREADY_TAKEN } from "../../utils/direction";
 
 const rotatePieceMiddleware = store => next => action => {
-    if (action.type === ROTATE_PIECE && store.getState().room.current !== null) {
+    if (action.type === ROTATE_PIECE && store.getState().room.current) {
         const board = store.getState().room.board;
         const position = store.getState().room.current.position;
         const indexRotation = store.getState().room.current.indexRotation - 1;
