@@ -7,7 +7,7 @@
 		"client-dev": "webpack-dev-server --mode development",
 		"client-build": "webpack --mode production",
 		"coverage": "jest --coverage",
-		"test": "jest",
+		"test": "jest --no-cache",
 		"server": "node ./src/server/server.js"
 	},
 	"devDependencies": {
