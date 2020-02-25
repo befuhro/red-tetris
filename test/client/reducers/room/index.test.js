@@ -10,18 +10,10 @@ import {
     rotatePiece,
     changeInterval,
     startPartySuccess,
-    joinRoomSuccess as joinRoomSuccessAction,
-    joinRoomFailure as joinRoomFailureAction,
-    updateRoom as updateRoomAction
 } from "../../../../src/client/actions/room";
 import cloneDeep from "lodash/cloneDeep";
 import io from "socket.io-client";
 import {BOTTOM} from "../../../../src/client/utils/direction";
-import {
-    joinRoomFailure as joinRoomFailureReducer,
-    joinRoomSuccess as joinRoomSuccessReducer, updateRoom as updateRoomReducer
-} from "../../../../src/client/reducers/room/room";
-
 
 const socket = io('');
 
@@ -220,7 +212,7 @@ describe('move piece action', () => {
 
 describe('join room action', () => {
     it('should return same state', () => {
-        const action = joinRoomSuccessAction(null, null, null, {}, null);
+        const action = joinRoomSuccess(null, null, null, {}, null);
         expect(reducer(initialState(), action)).toMatchObject(initialState());
     });
 
