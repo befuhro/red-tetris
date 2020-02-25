@@ -18,12 +18,10 @@ function connectPlayer(socket, data) {
         }
     });
 
-    socket.on('update spectrum', (spectrum) => {
-        games[data.room].players[data.username].updateSpectrum(spectrum);
-    });
-
     // Handle pieces fetching
     socket.on('fetch pieces', (from, callback) => {
+        if (games[data.room].players[data.username].ended)
+            callback({pieces: [], message: "player has lost"});
         console.log('fetching pieces from ' + from);
         callback({pieces: games[data.room].fetchPieces(from)});
     });
@@ -32,13 +30,58 @@ function connectPlayer(socket, data) {
     socket.on('start party', (callback) => {
         if (socket.id === Object.values(games[data.room].players)[0].socket.id) {
             console.log('game of room ' + data.room + ' has now started');
-            callback({authorizedToLaunchParty: true});
             games[data.room].gameIsStarted = true;
+            callback({authorizedToLaunchParty: true});
             socket.to(data.room).emit('launch party');
         } else {
             console.log('could not launch game of room ' + data.room);
             callback({authorizedToLaunchParty: false});
         }
+    });
+
+	/*
+	 * Set a game mode, 'normal', 'sudden death'
+	*/
+	socket.on('mode set', (mode, callback) => {
+        if (socket.id === Object.values(games[data.room].players)[0].socket.id) {
+			if (Object.keys(games[data.room].players).length < 2) {
+				callback({authorized: true, error: 'The room needs at least 2 players'});
+				return;
+			}
+			games[data.room].mode = mode;
+			callback({authorized: true});
+		} else {
+			callback({authorized: false, error: 'You are not the party leader'});
+		}
+	});
+
+	/*
+	 * Broadcast to all room
+	*/
+	socket.on('broadcast send', (data, callback) => {
+		socket.to(data.room).emit('broadcast received', data);
+		callback(data);
+	});
+
+
+	/*
+	 * Gets if a player has lost, if no player left set the game as over
+	*/
+    socket.on('player ended', (callback) => {
+        games[data.room].players[data.username].ended = true;
+        isgameover = true;
+        console.log(username + " has ended");
+        socket.to(data.room).emit('player ended', data.username);
+        Object.values(game[data.room].players).forEach((player) => {
+            if (player.ended === false) {
+                isgameover = false;
+            }
+        });
+        console.log("game " + data.room + " is over");
+        if (isgameover) {
+            socket.to(data.room).emit("game over");
+        }
+        callback({ gameover: isgameover });
     });
 
     /*
@@ -61,12 +104,56 @@ function connectPlayer(socket, data) {
     });
 
     /*
-    * Must see how we handle score
-    * Fires when a piece has been placed
+    * Fires when a piece has been placed, add pieces when there is not enough
     */
-    socket.on('piece placed', (piece_num, callback) => {
-        let score = game[data.room].players[data.username].score++;
-        callback({score: game[data.room].players[data.username].score});
+    socket.on('piece placed', (spectrum, callback) => {
+        let score = 0;
+		games[data.room].players[data.username].updateSpectrum(spectrum);
+		games[data.room].players[data.username].pieces_placed++;
+        if (games[data.room].mode == 'normal') {
+			score = games[data.room].players[data.username].score++;
+		}
+		else if (games[data.room].mode == 'sudden death') {
+			let spectrum = games[data.room].players[data.username].spectrum;
+			score = spectrum.length;
+			spectrum.forEach((line) => {
+				if (line.reduce((accumulator, value) => {accumulator + value}) != 0) {
+					score--;
+				}
+			});
+			if (games[data.room].players[data.username].pieces_placed == 30) {
+				callback({score: score, ended: false, message: 'Wave ended, waiting for other players...'});
+				return;
+			}
+			let new_wave = true;
+			Object.values(game[data.room].players).forEach((player) => {
+				if (player.pieces_placed != 30) {
+					new_wave = false;
+				}
+			})
+			if (new_wave) {
+				let worst_user = {score: 99999999, user: null};
+				Object.values(games[data.room].players).forEach((player) => {
+					if (worst_user.ended === false && worst_user.score > player.score) {
+                        worst_user = { score: player.score, user: data.username };
+					}
+				});
+				if (worst_user.user === data.username) {
+					games[data.room].players[data.username].ended = true;
+					console.log("Player " + player.username + " is eliminated");
+                    callback({ score: score, ended: true, message: 'Wave ended, you got left begin and are now disqualified...' });
+				}
+                Object.keys(games[data.room].players).forEach((player_id) => {
+                    games[data.room].players[player_id].pieces_placed = 0;
+                });
+			}
+		}
+        console.log("piece placed", games[data.room].Pieces.length, 10 + games[data.room].players[data.username].pieces_placed);
+        if (games[data.room].Pieces.length < (10 + games[data.room].players[data.username].pieces_placed)) {
+            let piece = games[data.room].Pieces.length;
+            games[data.room].addPieces(10);
+        }
+		callback({score: score, ended: false});
     });
 
     /*
@@ -77,15 +164,6 @@ function connectPlayer(socket, data) {
         game[data.room].players[data.username].ended = true;
         callback({end: true, score: game[data.room].players[data.username].score});
     });
-
-    /*
-     * Must see if not better to emit interval instead of getting it
-     * Returns the time between each move
-    */
-    // socket.on('get interval', (callback) => {
-    //     callback({interval: games[data.room].interval});
-    // });
-
 
     // Broadcast when a opponent joins the room.
     socket.to(data.room).emit('opponent connection', {
