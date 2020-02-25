@@ -9,11 +9,18 @@ import {
     movePiece,
     rotatePiece,
     changeInterval,
-    startPartySuccess
+    startPartySuccess,
+    joinRoomSuccess as joinRoomSuccessAction,
+    joinRoomFailure as joinRoomFailureAction,
+    updateRoom as updateRoomAction
 } from "../../../../src/client/actions/room";
 import cloneDeep from "lodash/cloneDeep";
 import io from "socket.io-client";
 import {BOTTOM} from "../../../../src/client/utils/direction";
+import {
+    joinRoomFailure as joinRoomFailureReducer,
+    joinRoomSuccess as joinRoomSuccessReducer, updateRoom as updateRoomReducer
+} from "../../../../src/client/reducers/room/room";
 
 
 const socket = io('');
@@ -34,6 +41,10 @@ describe('change interval action', () => {
 });
 
 describe('rotate piece action', () => {
+    it('should return same state', () => {
+        expect(reducer(initialState(), rotatePiece())).toMatchObject(initialState());
+    });
+
     it('should return rotated piece', () => {
         const initState = initialState();
         const current = {
@@ -167,6 +178,12 @@ describe('move piece action', () => {
 });
 
 describe('join room action', () => {
+    it('should return same state', () => {
+        const action = joinRoomSuccessAction(null, null, null, {}, null);
+        expect(reducer(initialState(), action)).toMatchObject(initialState());
+    });
+
+
     it('should return new state', () => {
         const action = joinRoomSuccess('befuhro', '101', null, [], true);
         expect(reducer(initialState(), action)).toMatchObject({
@@ -179,12 +196,21 @@ describe('join room action', () => {
         });
     });
 
+
+    it('should return same state', () => {
+        expect(reducer(initialState(), joinRoomFailure(null))).toMatchObject(initialState());
+    });
+
     it('should return state with new errors', () => {
         expect(reducer(initialState(), joinRoomFailure(['The room is full.'])))
             .toMatchObject({
                 ...initialState(),
                 errors: ['The room is full.']
             });
+    });
+
+    it('should return initial state', () => {
+        expect(reducer(initialState(), updateRoom([], 'farfadet'))).toMatchObject(initialState())
     });
 
 });
