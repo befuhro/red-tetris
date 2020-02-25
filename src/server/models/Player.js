@@ -2,6 +2,7 @@ class Player {
     constructor(username, socket, room) {
         this.username = username;
         this.score = 0;
+		this.pieces_placed = 0;
 		this.ended = false;
 		this.socket = socket;
         this.room = room;
