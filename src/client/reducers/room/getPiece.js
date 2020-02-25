@@ -1,7 +1,8 @@
 import clone from "lodash/clone";
-import { putCurrentToBoard, getUncompletedRows, createShiftingArray, emptyCompleteRows } from "../../utils/newPiece";
+import {putCurrentToBoard} from "../../utils/newPiece";
+import {getCompleteLines, removeCompleteLines} from "../../utils/removeCompleteLines";
 
-const updateSpectrum = (socket, board) => {
+const createSpectrum = (board) => {
     let spectrum = [];
     board.forEach((bloc, index) => {
         const row = Math.floor(index / 10);
@@ -13,6 +14,11 @@ const updateSpectrum = (socket, board) => {
             spectrum[row][column] = 1;
         }
     });
+    return spectrum
+};
+
+const updateSpectrum = (socket, board) => {
+    const spectrum = createSpectrum(board);
     socket.emit('update spectrum', spectrum);
 };
 
@@ -20,10 +26,10 @@ export const getPiece = (state) => {
     const piece = state.pieces[0];
     let newState = clone(state);
     newState.board = putCurrentToBoard(state.board, state.current);
-    const uncompletedRows = getUncompletedRows(newState.board);
-    if (uncompletedRows.length !== 20) {
-        const shiftingArray = createShiftingArray(uncompletedRows);
-        newState.board = emptyCompleteRows(shiftingArray, newState.board);
+    // Remove complete lines
+    const completeLines = getCompleteLines(state.board);
+    if (completeLines.length !== 0) {
+        newState.board = removeCompleteLines(state.board, completeLines);
     }
     newState.pieces.shift();
     newState.indexPieces++;

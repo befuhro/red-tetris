@@ -20,7 +20,6 @@ export const joinRoom = (username, room) => {
                     };
                 }
                 else {
-                    // console.log(data);
                     dispatch(joinRoomFailure(data.reasons));
                 }
             });

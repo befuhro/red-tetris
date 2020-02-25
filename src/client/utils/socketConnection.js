@@ -3,9 +3,9 @@ import {updateRoom, askPiece, updateSpectrum, changeInterval} from "../actions/r
 export const roomConnection = (socket, dispatch) => {
     // Handle opponent connection and disconnection
     socket.on("opponent connection", (data) => {
-        console.log(data);
         dispatch(updateRoom(data.players, data.leaderName));
     });
+
     socket.on("opponent disconnection", (data) => {
         dispatch(updateRoom(data.players, data.leaderName));
     });
@@ -13,7 +13,6 @@ export const roomConnection = (socket, dispatch) => {
     socket.on('new spectrum', (data) => dispatch(updateSpectrum(data.username, data.spectrum)));
 
     socket.on('update interval', (value) => {
-        console.log(value);
         dispatch(changeInterval(value));
     });
 

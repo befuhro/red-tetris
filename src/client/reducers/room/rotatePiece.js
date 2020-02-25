@@ -1,17 +1,18 @@
-import clone from "lodash/clone";
-
 export const rotatePiece = (state) => {
-    let newState = clone(state);
-    const rotation = state.current.rotation[state.current.indexRotation - 1];
-    newState.current.position.forEach((position, index) => {
-        position.column += rotation[index].column;
-        position.row += rotation[index].row;
-    });
-    if (newState.current.indexRotation < 4) {
-        newState.current.indexRotation++;
-    } else {
-        newState.current.indexRotation = 1;
+    if (state.current) {
+        const rotation = state.current.rotation[state.current.indexRotation - 1];
+        return {
+            ...state,
+            current: {
+                ...state.current,
+                indexRotation: state.current.indexRotation < 4 ? state.current.indexRotation + 1 : 1,
+                lastMove: Math.floor(Date.now() / 100),
+                position: state.current.position.map((position, index) => ({
+                    column: position.column + rotation[index].column,
+                    row: position.row + rotation[index].row
+                }))
+            }
+        }
     }
-    newState.current.lastMove = Math.floor(Date.now() / 100);
-    return (newState);
+    return state;
 };
