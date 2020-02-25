@@ -42,7 +42,7 @@ describe('change interval action', () => {
 
 describe('rotate piece action', () => {
     it('should return same state', () => {
-        expect(reducer(initialState(), rotatePiece())).toMatchObject(initialState());
+        expect(reducer( undefined, rotatePiece())).toMatchObject(initialState());
     });
 
     it('should return rotated piece', () => {
@@ -50,6 +50,39 @@ describe('rotate piece action', () => {
         const current = {
             position: [{column: 3, row: 8}, {column: 3, row: 9}, {column: 4, row: 9}, {column: 5, row: 9}],
             indexRotation: 1,
+            rotation: [
+                [{column: 2, row: 0}, {column: 1, row: -1}, {column: 0, row: 0}, {column: -1, row: 1}],
+                [{column: 0, row: 2}, {column: 1, row: 1}, {column: 0, row: 0}, {column: -1, row: -1}],
+                [{column: -2, row: 0}, {column: -1, row: 1}, {column: 0, row: 0}, {column: 1, row: -1}],
+                [{column: 0, row: -2}, {column: -1, row: -1}, {column: 0, row: 0}, {column: 1, row: 1}],
+            ]
+        };
+        const originalState = {
+            ...initState,
+            current: {
+                ...initState.current,
+                ...current
+            }
+        };
+        const rotation = originalState.current.rotation[originalState.current.indexRotation - 1];
+        expect(reducer(originalState, rotatePiece())).toMatchObject({
+            ...originalState,
+            current: {
+                ...originalState.current,
+                indexRotation: originalState.current.indexRotation < 4 ? originalState.current.indexRotation + 1 : 1,
+                position: originalState.current.position.map((position, index) => ({
+                    column: position.column + rotation[index].column,
+                    row: position.row + rotation[index].row
+                }))
+            }
+        })
+    });
+
+    it('should return rotated piece', () => {
+        const initState = initialState();
+        const current = {
+            position: [{column: 3, row: 8}, {column: 3, row: 9}, {column: 4, row: 9}, {column: 5, row: 9}],
+            indexRotation: 4,
             rotation: [
                 [{column: 2, row: 0}, {column: 1, row: -1}, {column: 0, row: 0}, {column: -1, row: 1}],
                 [{column: 0, row: 2}, {column: 1, row: 1}, {column: 0, row: 0}, {column: -1, row: -1}],
@@ -151,24 +184,32 @@ describe('move piece action', () => {
         const formerState = {
             ...initialState(),
             current: {
-                position: [
-                    {column: 4, row: 0},
-                    {column: 4, row: 1},
-                    {column: 4, row: 2},
-                    {column: 4, row: 3},
-                ],
+                position: [{column: 4, row: 0}, {column: 4, row: 1}, {column: 4, row: 2}, {column: 4, row: 3}],
                 color: 'lightblue'
             }
         };
         const newState = {
             ...initialState(),
             current: {
-                position: [
-                    {column: 4, row: 1},
-                    {column: 4, row: 2},
-                    {column: 4, row: 3},
-                    {column: 4, row: 4},
-                ],
+                position: [{column: 4, row: 1}, {column: 4, row: 2}, {column: 4, row: 3}, {column: 4, row: 4}],
+                color: 'lightblue'
+            }
+        };
+        expect(reducer(formerState, movePiece(BOTTOM))).toMatchObject(newState);
+    });
+
+    it('should return new board and new position', () => {
+        const formerState = {
+            ...initialState(),
+            current: {
+                position: [{column: 4, row: 0}, {column: 4, row: 1}, {column: 4, row: 2}, {column: 4, row: 3}],
+                color: 'lightblue'
+            }
+        };
+        const newState = {
+            ...initialState(),
+            current: {
+                position: [{column: 4, row: 1}, {column: 4, row: 2}, {column: 4, row: 3}, {column: 4, row: 4}],
                 color: 'lightblue'
             }
         };
