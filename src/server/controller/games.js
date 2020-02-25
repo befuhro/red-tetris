@@ -20,6 +20,8 @@ function connectPlayer(socket, data) {
 
     // Handle pieces fetching
     socket.on('fetch pieces', (from, callback) => {
+        if (games[data.room].players[data.username].ended)
+            callback({pieces: [], message: "player has lost"});
         console.log('fetching pieces from ' + from);
         callback({pieces: games[data.room].fetchPieces(from)});
     });
@@ -65,22 +67,22 @@ function connectPlayer(socket, data) {
 	/*
 	 * Gets if a player has lost, if no player left set the game as over
 	*/
-	socket.on('player ended', (callback)) => {
-		games[data.room].players[data.username].ended = true;
-		ended = true;
-		console.log(username + " has ended");
-		socket.to(data.room).emit('player ended', data.username);
-		Object.values(game[data.room].players).forEach((player) => {
-			if (player.ended === false) {
-				ended = false;
-			}
-		}
-		console.log("game " + data.room + " is over");
-		if (ended) {
-			socket.to(data.room).emit("game over");
-		}
-		callback({gameover: ended});
-	}
+    socket.on('player ended', (callback) => {
+        games[data.room].players[data.username].ended = true;
+        isgameover = true;
+        console.log(username + " has ended");
+        socket.to(data.room).emit('player ended', data.username);
+        Object.values(game[data.room].players).forEach((player) => {
+            if (player.ended === false) {
+                isgameover = false;
+            }
+        });
+        console.log("game " + data.room + " is over");
+        if (isgameover) {
+            socket.to(data.room).emit("game over");
+        }
+        callback({ gameover: isgameover });
+    });
 
     /*
      * Sets the time between each move aka the interval
@@ -102,7 +104,7 @@ function connectPlayer(socket, data) {
     });
 
     /*
-    * Fires when a piece has been placed, add pieces when there is not enough 
+    * Fires when a piece has been placed, add pieces when there is not enough
     */
     socket.on('piece placed', (spectrum, callback) => {
         let score = 0;
@@ -120,7 +122,7 @@ function connectPlayer(socket, data) {
 				}
 			});
 			if (games[data.room].players[data.username].pieces_placed == 30) {
-				callback({score: score, ended:false, message: 'Wave ended, waiting for other players...'});
+				callback({score: score, ended: false, message: 'Wave ended, waiting for other players...'});
 				return;
 			}
 			let new_wave = true;
@@ -133,22 +135,25 @@ function connectPlayer(socket, data) {
 				let worst_user = {score: 99999999, user: null};
 				Object.values(games[data.room].players).forEach((player) => {
 					if (worst_user.ended === false && worst_user.score > player.score) {
-						worst_user.score = player.score;
+                        worst_user = { score: player.score, user: data.username };
 					}
 				});
 				if (worst_user.user === data.username) {
 					games[data.room].players[data.username].ended = true;
 					console.log("Player " + player.username + " is eliminated");
-					callback({score: score, ended: true, message: 'Wave ended, you got left begin and got disqualified...'});
+                    callback({ score: score, ended: true, message: 'Wave ended, you got left begin and are now disqualified...' });
 				}
-				Object.values(games[data.room].players).forEach((player) => {
-					player.pieces_placed = 0;
-				}
+                Object.keys(games[data.room].players).forEach((player_id) => {
+                    games[data.room].players[player_id].pieces_placed = 0;
+                });
 			}
 		}
-		if (games[data.room].Pieces.length <= 5)
-			games[data.room].addPiece(5);
-        callback({score: score, ended: false});
+        console.log("piece placed", games[data.room].Pieces.length, 10 + games[data.room].players[data.username].pieces_placed);
+        if (games[data.room].Pieces.length < (10 + games[data.room].players[data.username].pieces_placed)) {
+            let piece = games[data.room].Pieces.length;
+            games[data.room].addPieces(10);
+        }
+		callback({score: score, ended: false});
     });
 
     /*

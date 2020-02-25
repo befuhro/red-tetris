@@ -19,7 +19,8 @@ const createSpectrum = (board) => {
 
 const updateSpectrum = (socket, board) => {
     const spectrum = createSpectrum(board);
-    socket.emit('update spectrum', spectrum);
+    socket.emit('piece placed', spectrum, (data) => {
+    });
 };
 
 export const getPiece = (state) => {

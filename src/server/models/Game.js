@@ -42,7 +42,7 @@ class Game {
         Object.entries(copyPlayers).forEach(([key]) => list.push(key));
         return (list);
     }
-	
+
 	setInterval(value) {
 		if (value > 0 && value <= 1000) {
 			this.interval = value;
