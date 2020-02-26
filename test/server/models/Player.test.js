@@ -4,13 +4,14 @@ import Player from "../../../src/server/models/Player";
 
 describe('player', () => {
 
-    it('construct', () => {
+    it('construct', (done) => {
         let player = new Player('dédé', null, null);
         expect(player.username === 'dédé');
         expect(player.score === 0);
+        done();
     });
 
-    it('spectrum', () => {
+    it('spectrum', (done) => {
         let socket = new SocketMock();
         socket.join("myroom");
         socket.on('new_spectrum', (data) => {
@@ -22,5 +23,6 @@ describe('player', () => {
             spectrum[i] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
         }
         player.updateSpectrum(spectrum);
+        done();
     });
 });

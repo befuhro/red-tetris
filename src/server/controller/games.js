@@ -21,9 +21,9 @@ function connectPlayer(socket, data) {
     // Handle pieces fetching
     socket.on('fetch pieces', (from, callback) => {
         if (games[data.room].players[data.username].ended)
-            callback({pieces: [], message: "player has lost"});
+            if (callback) callback({pieces: [], message: "player has lost"});
         console.log('fetching pieces from ' + from);
-        callback({pieces: games[data.room].fetchPieces(from)});
+        if (callback) callback({pieces: games[data.room].fetchPieces(from)});
     });
 
     // Handle party launching
@@ -31,11 +31,11 @@ function connectPlayer(socket, data) {
         if (socket.id === Object.values(games[data.room].players)[0].socket.id) {
             console.log('game of room ' + data.room + ' has now started');
             games[data.room].gameIsStarted = true;
-            callback({authorizedToLaunchParty: true});
-            socket.to(data.room).emit('launch party');
+            if (callback) callback({authorizedToLaunchParty: true});
+            socket.broadcast.to(data.room).emit('launch party');
         } else {
             console.log('could not launch game of room ' + data.room);
-            callback({authorizedToLaunchParty: false});
+            if (callback) callback({authorizedToLaunchParty: false});
         }
     });
 
@@ -62,7 +62,6 @@ function connectPlayer(socket, data) {
 		socket.to(data.room).emit('broadcast received', data);
 		callback(data);
 	});
-
 
 	/*
 	 * Gets if a player has lost, if no player left set the game as over
@@ -199,9 +198,9 @@ function checkAvailability(username, room) {
         if (Object.keys(games[room].players).length >= 4) {
             authData['reasons'].push({message: 'The room is full.', id: 2});
         }
-        if (authData['reasons'].length === 0) {
-            authData['reasons'].push({message: 'Reason unknown.', id: 3});
-        }
+        // if (authData['reasons'].length === 0) {
+        //     authData['reasons'].push({message: 'Reason unknown.', id: 3});
+        // }
     }
     return (authData);
 }
@@ -214,13 +213,11 @@ function handleRoomConnection(socket) {
         if (authData['canConnect'] === false) {
             if (callback) callback(authData);
         }
-        console.log(data, callback);
         if (callback) callback(authData);
     });
 
     // User try to join room.
     socket.on('join room', (data, callback) => {
-        console.log(data, callback);
         const authData = checkAvailability(data.username, data.room);
         if (authData['canConnect'] === true) {
             let authData = {connected: true};
