@@ -1,9 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import Square from './Square';
 import logo from '../../assets/logo.svg';
-import {movePiece} from "../../actions/room";
-import {BOTTOM} from "../../utils/direction";
 
 const mainBlockStyle = {
     width: '35vh',
@@ -38,17 +36,7 @@ const boardStyle = {
     borderStyle: 'inset'
 };
 
-export default ({ board, intervalMove, dispatch }) => {
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            dispatch(movePiece(BOTTOM));
-        }, intervalMove);
-
-        return () => clearInterval(interval)
-    });
-
-
+export default ({ board }) => {
     return (
         <div style={mainBlockStyle} id={'env'}>
             <img src={logo} className='App-logo' alt='react-logo'/>

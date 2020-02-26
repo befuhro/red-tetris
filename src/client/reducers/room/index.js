@@ -22,7 +22,7 @@ import {changeInterval} from "./changeInterval";
 
 export const initialState = () => ({
     board: Array(200).fill({color: "white"}).map((square, index) => (
-        {...square, ...{row: Math.floor(index / 10), column: index % 10}})),
+        {...square, row: Math.floor(index / 10), column: index % 10})),
     current: null,
     pieces: [],
     intervalMove: 250,

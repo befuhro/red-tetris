@@ -18,7 +18,7 @@ const gameStyle = {
     justifyContent: 'space-around'
 };
 
-function handleKey(dispatch) {
+export function handleKey(dispatch) {
     return function (e) {
         switch (e.key) {
             case 'ArrowLeft':
@@ -42,19 +42,25 @@ function handleKey(dispatch) {
     }
 }
 
-export default ({dispatch, errors, match: {params}}) => {
+export default ({dispatch, errors, intervalMove, match: {params}}) => {
 
     useEffect(() => {
         dispatch(joinRoom(params.player, params.room));
+        const interval = setInterval(() => {
+            dispatch(movePiece(BOTTOM));
+        }, intervalMove);
 
         const curriedEvent = handleKey(dispatch);
         document.addEventListener('keydown', curriedEvent);
 
-        return () => document.removeEventListener('keydown', curriedEvent);
+        return () => {
+            clearInterval(interval);
+            document.removeEventListener('keydown', curriedEvent);
+        }
     });
 
     return (
-        <div onKeyDown={(e) => handleKey(e, dispatch)} tabIndex={0}>
+        <div id="main-game" onKeyDown={(e) => handleKey(e, dispatch)} tabIndex={0}>
             {errors === null ?
                 <div style={gameStyle}>
                     <GameWatcher/>

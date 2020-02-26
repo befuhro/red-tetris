@@ -64,7 +64,7 @@ export default ({errors, checkAvailability, deleteErrors}) => {
                         ENTER A ROOM
                     </label>
                     <input type="text" id="room" required/>
-                    <button style={buttonStyle} type="submit">Join game</button>
+                    <button  style={buttonStyle} type="submit">Join game</button>
                 </form>
                 {errors ?
                     <PopUp

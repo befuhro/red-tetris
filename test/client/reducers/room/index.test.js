@@ -27,8 +27,7 @@ const addFullLines = (board, lines) =>
 
 describe('change interval action', () => {
     it('should return return same state with different interval', () => {
-        expect(reducer(initialState(), changeInterval(500)))
-            .toMatchObject({...initialState(), intervalMove: 500})
+        expect(reducer(initialState(), changeInterval(500))).toMatchObject({...initialState(), intervalMove: 500})
     });
 });
 

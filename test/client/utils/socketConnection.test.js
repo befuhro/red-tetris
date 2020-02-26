@@ -7,7 +7,6 @@ const io = require('socket.io')(server);
 const room = io.of("/room");
 const socketClient = ioClient('localhost:8080/room');
 
-
 describe('socket', () => {
 
     beforeAll(done => {
@@ -23,12 +22,10 @@ describe('socket', () => {
 
     it('opponent connection', done => {
         roomConnection(socketClient, data => {
-            console.log(data);
             if (data.type === 'CHANGE_INTERVAL') done();
         });
 
         room.on('connect', socketServer => {
-
             socketServer.emit('opponent connection', {players: ['test'], leaderName: 'hada'});
             socketServer.emit('opponent disconnection', {players: ['test'], leaderName: 'hada'});
             socketServer.emit('new spectrum', {});

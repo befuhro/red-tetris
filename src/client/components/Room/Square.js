@@ -1,5 +1,4 @@
 import React from 'react';
-import {connect} from 'react-redux';
 
 const squareStyle = {
     height: '2.5vh',
@@ -19,7 +18,7 @@ const lightblueSquare = {backgroundColor: '#16e3dc'};
 const purpleSquare = {backgroundColor: '#b500ec'};
 const orangeSquare = {backgroundColor: '#ff9b00'};
 
-function Square({color, size}) {
+export default ({color, size}) => {
     switch (color) {
         case 'realwhite':
             return <div style={{...squareStyle, ...realWhiteSquare, ...size}} > </div>;
@@ -41,5 +40,3 @@ function Square({color, size}) {
             return <div style={{...squareStyle, ...whiteSquare, ...size}} > </div>;
     }
 }
-
-export default connect()(Square);

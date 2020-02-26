@@ -13,7 +13,7 @@ const insertCurrentIntoBoard = (board, current) => {
 const mapStateToProps = (state) => {
     let board = cloneDeep(state.room.board);
     board = state.room.current ? insertCurrentIntoBoard(board, state.room.current) : board;
-    return ({board: board, intervalMove: state.room.intervalMove});
+    return ({board: board});
 };
 
 const mapDispatchToProps = (dispatch) => ({
