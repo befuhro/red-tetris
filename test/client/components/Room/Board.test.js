@@ -15,6 +15,5 @@ describe('<Board>', () => {
                 {...square, row: Math.floor(index / 10), column: index % 10}))}
         />);
     });
-
     it('should render board', () => expect(component.html()).toMatchSnapshot());
 });
