@@ -14,11 +14,7 @@ describe('socket', () => {
         done();
     });
 
-    afterAll(done => {
-        server.close();
-        if (socketClient.connected) socketClient.disconnect();
-        done();
-    });
+// server.listen(808\ww0);
 
     it('opponent connection', done => {
         roomConnection(socketClient, data => {

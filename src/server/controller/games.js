@@ -166,7 +166,7 @@ function connectPlayer(socket, data) {
     });
 
     // Broadcast when a opponent joins the room.
-    socket.to(data.room).emit('opponent connection', {
+    socket.broadcast.to(data.room).emit('opponent connection', {
         players: games[data.room].getPlayersInfo(),
         leaderName: games[data.room].leaderName
     });
@@ -210,17 +210,17 @@ function handleRoomConnection(socket) {
     // User check for username and room availability.
     socket.on('check availability', (data, callback) => {
         const authData = checkAvailability(data.username, data.room);
-        // callback(authData);
+        if (callback) callback(authData);
         if (authData['canConnect'] === false) {
-            callback(authData);
-            socket.disconnect();
+            if (callback) callback(authData);
         }
-        callback(authData);
+        console.log(data, callback);
+        if (callback) callback(authData);
     });
 
     // User try to join room.
     socket.on('join room', (data, callback) => {
-        // tryToConnect(socket, data, callback)
+        console.log(data, callback);
         const authData = checkAvailability(data.username, data.room);
         if (authData['canConnect'] === true) {
             let authData = {connected: true};
@@ -231,10 +231,9 @@ function handleRoomConnection(socket) {
                 authData = {...authData, ...{players: games[data.room].getPlayersInfo(), isRoomLeader: false}};
             }
             connectPlayer(socket, data);
-            callback(authData);
+            if (callback) callback(authData);
         } else {
-            callback({isConnected: false, reasons: authData['reasons']});
-            socket.disconnect();
+            if (callback) callback({isConnected: false, reasons: authData['reasons']});
         }
     });
 }

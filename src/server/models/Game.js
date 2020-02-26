@@ -64,9 +64,8 @@ class Game {
         if (playerName === this.leaderName) {
             this.leaderName = playersList[1];
         }
-        this.players[playerName].socket.to(this.name).emit("opponent disconnection", {
+        this.players[playerName].socket.broadcast.to(this.name).emit("opponent disconnection", {
             players: players, leaderName: this.leaderName });
-        this.players[playerName].socket.disconnect();
         delete this.players[playerName];
     }
 }
