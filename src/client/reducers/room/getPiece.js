@@ -35,9 +35,9 @@ const checkEndParty = (board, piece) => {
     return finished;
 };
 
-const endParty = socket => {
-    socket.emit('player ended', (data) => console.log(data));
-};
+const endParty = socket => socket.emit('player ended', (data) => console.log(data));
+
+const sendEmptyLine = (socket, numberOfLines) => socket.emit('line lock', numberOfLines);
 
 export const getPiece = (state) => {
     let newState = clone(state);
@@ -46,6 +46,7 @@ export const getPiece = (state) => {
     const completeLines = getCompleteLines(state.board);
     if (completeLines.length !== 0) {
         newState.board = removeCompleteLines(state.board, completeLines);
+        sendEmptyLine(newState.socket, completeLines.length);
     }
     newState.pieces.shift();
     newState.indexPieces++;

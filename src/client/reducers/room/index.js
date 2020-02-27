@@ -12,6 +12,7 @@ import {
     PLAYER_LOST,
     DISPLAY_ERROR,
     CLEAR_ERROR,
+    ADD_LINES,
     CHANGE_INTERVAL
 } from "../../actions/room";
 
@@ -25,6 +26,7 @@ import {updateSpectrum} from "./spectrum";
 import {changeInterval} from "./changeInterval";
 import {gameStart} from "./gameStart";
 import {playerLost} from "./playerLost";
+import {addLines} from "./addLines";
 
 export const initialState = () => ({
     board: Array(200).fill({color: "white"}).map((square, index) => (
@@ -74,6 +76,8 @@ export default (state = initialState(), action) => {
             return (displayError(state, action));
         case CLEAR_ERROR:
             return initialState();
+        case ADD_LINES:
+            return addLines(state, action);
         default:
             return state;
     }
