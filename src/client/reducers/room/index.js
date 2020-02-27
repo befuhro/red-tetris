@@ -9,6 +9,9 @@ import {
     ROTATE_PIECE,
     UPDATE_ROOM,
     GAME_START,
+    PLAYER_LOST,
+    DISPLAY_ERROR,
+    CLEAR_ERROR,
     CHANGE_INTERVAL
 } from "../../actions/room";
 
@@ -21,6 +24,7 @@ import {fetchPieces} from "./fetchPieces";
 import {updateSpectrum} from "./spectrum";
 import {changeInterval} from "./changeInterval";
 import {gameStart} from "./gameStart";
+import {playerLost} from "./playerLost";
 
 export const initialState = () => ({
     board: Array(200).fill({color: "white"}).map((square, index) => (
@@ -37,6 +41,8 @@ export const initialState = () => ({
     players: {},
     errors: null
 });
+
+const displayError = (state, action) => ({...state, errors: [{id: 0,message: action.error}]});
 
 export default (state = initialState(), action) => {
     switch (action.type) {
@@ -62,6 +68,12 @@ export default (state = initialState(), action) => {
             return (changeInterval(state, action));
         case GAME_START:
             return (gameStart(state));
+        case PLAYER_LOST:
+            return playerLost(state, action);
+        case DISPLAY_ERROR:
+            return (displayError(state, action));
+        case CLEAR_ERROR:
+            return initialState();
         default:
             return state;
     }

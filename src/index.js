@@ -9,6 +9,7 @@ import {createLogger} from 'redux-logger';
 import rootReducer from './client/reducers';
 import Login from './client/containers/Login';
 import Room from './client/containers/Room';
+import playerLostMiddleware from './client/middlewares/room/playerLost';
 import rotatePieceMiddleware from './client/middlewares/room/rotatePiece'
 import movePieceMiddleware from './client/middlewares/room/movePiece'
 import './client/assets/style.css';
@@ -18,9 +19,10 @@ const loggerMiddleware = createLogger();
 const store = createStore(rootReducer,
     applyMiddleware(
         thunkMiddleware,
-        // loggerMiddleware,
+        loggerMiddleware,
         rotatePieceMiddleware,
         movePieceMiddleware,
+        playerLostMiddleware
     )
 );
 

@@ -1,22 +1,12 @@
 import React, {useEffect} from 'react';
 import WebFont from 'webfontloader';
 
-import GameController from '../../containers/Room/GameController';
-import GameWatcher from "../../containers/Room/GameWatcher";
-
-import {joinRoom, movePiece, rotatePiece} from "../../actions/room";
+import {clearError, joinRoom, movePiece, rotatePiece} from "../../actions/room";
 import {BOTTOM, LEFT, RIGHT, LOWEST} from "../../utils/direction";
 
-import Board from '../../containers/Room/Board';
-import PopUp from './PopUp';
-import Footer from "../shared/Footer";
+import Wrapper from '../../containers/Room/Wrapper'
 
 WebFont.load({google: {families: ['Permanent Marker', 'Orbitron: black']}});
-
-const gameStyle = {
-    display: 'flex',
-    justifyContent: 'space-around'
-};
 
 export function handleKey(dispatch) {
     return function (e) {
@@ -42,35 +32,27 @@ export function handleKey(dispatch) {
     }
 }
 
-export default ({dispatch, errors, intervalMove, match: {params}}) => {
+export default ({dispatch, match: {params}}) => {
 
     useEffect(() => {
         dispatch(joinRoom(params.player, params.room));
         const interval = setInterval(() => {
             dispatch(movePiece(BOTTOM));
-        }, intervalMove);
+        }, 250);
 
         const curriedEvent = handleKey(dispatch);
         document.addEventListener('keydown', curriedEvent);
 
         return () => {
             clearInterval(interval);
+            dispatch(clearError());
             document.removeEventListener('keydown', curriedEvent);
         }
-    });
+    }, []);
 
     return (
         <div id="main-game" onKeyDown={(e) => handleKey(e, dispatch)} tabIndex={0}>
-            {errors === null ?
-                <div style={gameStyle}>
-                    <GameWatcher/>
-                    <Board/>
-                    <GameController/>
-                </div>
-                :
-                <PopUp errors={errors}/>
-            }
-            <Footer/>
+            <Wrapper/>
         </div>
     )
 }

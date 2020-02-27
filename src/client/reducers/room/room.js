@@ -7,7 +7,7 @@ export const joinRoomSuccess = (state, action) => ({
     isRoomLeader: action.isRoomLeader
 });
 
-export const joinRoomFailure = (state, action) => ({ ...state, errors: action.errors });
+export const joinRoomFailure = (state, action) => ({ ...state, errors: state.errors? state.errors : action.errors });
 
 export const updateRoom = (state, action) => {
     const players = action.players;

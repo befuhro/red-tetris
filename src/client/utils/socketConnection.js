@@ -1,4 +1,4 @@
-import {updateRoom, askPiece, updateSpectrum, changeInterval, gameStart} from "../actions/room";
+import {updateRoom, askPiece, updateSpectrum, changeInterval, gameStart, playerLost} from "../actions/room";
 
 export const roomConnection = (socket, dispatch) => {
     // Handle opponent connection and disconnection
@@ -21,4 +21,6 @@ export const roomConnection = (socket, dispatch) => {
         dispatch(askPiece());
         dispatch(gameStart());
     });
+
+    socket.on('player ended', username => dispatch(playerLost(username)));
 };

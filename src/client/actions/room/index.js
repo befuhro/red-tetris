@@ -119,3 +119,12 @@ export const startPartyFailure = () => ({ type: START_PARTY_FAILURE });
 
 export const GAME_START = 'GAME_START';
 export const gameStart = () => ({type: GAME_START});
+
+export const PLAYER_LOST = 'PLAYER_LOST';
+export const playerLost = username => ({type: PLAYER_LOST, username: username});
+
+export const DISPLAY_ERROR = 'DISPLAY_ERROR';
+export const displayError = error => ({type: DISPLAY_ERROR, error: error});
+
+export const CLEAR_ERROR = 'CLEAR_ERROR';
+export const clearError = () => ({type: CLEAR_ERROR});

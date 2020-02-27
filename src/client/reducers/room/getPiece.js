@@ -25,11 +25,13 @@ const updateSpectrum = (socket, board) => {
 
 const checkEndParty = (board, piece) => {
     let finished = false;
-    piece.position.forEach(bloc => {
-        if (board[bloc.column + (bloc.row * 10)].color !== 'white') {
-            finished = true;
-        }
-    });
+    if (piece) {
+        piece.position.forEach(bloc => {
+            if (board[bloc.column + (bloc.row * 10)].color !== 'white') {
+                finished = true;
+            }
+        });
+    }
     return finished;
 };
 

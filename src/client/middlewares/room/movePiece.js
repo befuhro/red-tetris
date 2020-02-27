@@ -4,7 +4,7 @@ import checkNewPosition from "../../utils/checkNewPosition";
 import getNewPosition from "../../utils/getNewPosition";
 
 const movePieceMiddleware = store => next => action => {
-    if (action.type === MOVE_PIECE && store.getState().room.current !== null) {
+    if (action.type === MOVE_PIECE && store.getState().room.current) {
         const board = store.getState().room.board;
         const position = store.getState().room.current.position;
         const newPosition = getNewPosition(position, action.direction === LOWEST ? BOTTOM : action.direction);
@@ -20,7 +20,7 @@ const movePieceMiddleware = store => next => action => {
                 store.dispatch(askPiece());
             }
         }
-    } else {
+    } else if (action.type !== MOVE_PIECE) {
         next(action);
     }
 };

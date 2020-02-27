@@ -16,7 +16,7 @@ const pieceViewStyle = {
 
 function createArray(piece) {
     let array = Array(16).fill({color: 'white'});
-    if (piece !== undefined) {
+    if (piece) {
         piece.position.forEach((position) => {
             array[(position.row * 4) + position.column - 3] = { color: piece.color };
         });

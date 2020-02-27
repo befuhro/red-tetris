@@ -72,7 +72,7 @@ function connectPlayer(socket, data) {
         games[data.room].players[data.username].ended = true;
         let isgameover = true;
         console.log(data.username + " has ended");
-        socket.broadcast.to(data.room).emit('player ended', data.username);
+        socket.emit('player ended', data.username);
         Object.values(games[data.room].players).forEach((player) => {
             if (player.ended === false) {
                 isgameover = false;

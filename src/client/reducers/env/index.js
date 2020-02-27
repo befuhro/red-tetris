@@ -1,5 +1,5 @@
 import clone from "lodash/clone";
-import { CHECK_AVAILABILITY_FAILURE, DELETE_ERRORS} from "../../actions/env";
+import { CHECK_AVAILABILITY_FAILURE, DELETE_ERRORS, DISPLAY_ERROR} from "../../actions/env";
 
 const initialState = () => ({
     errors: null,
@@ -25,6 +25,7 @@ function login(state = initialState(), action) {
             return (checkAvailabilityFailure(state, action));
         case DELETE_ERRORS:
             return (deleteErrors(state));
+
         default:
             return (state);
     }

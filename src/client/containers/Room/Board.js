@@ -4,8 +4,10 @@ import cloneDeep from 'lodash/cloneDeep';
 import Board from '../../components/Room/Board';
 
 const insertCurrentIntoBoard = (board, current) => {
-    for (let i = 0; i < 4; i++) {
-        board[(current.position[i].row * 10) + current.position[i].column].color = current.color;
+    if (current) {
+        for (let i = 0; i < 4; i++) {
+            board[(current.position[i].row * 10) + current.position[i].column].color = current.color;
+        }
     }
     return (board);
 };
