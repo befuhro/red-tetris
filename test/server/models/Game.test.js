@@ -4,19 +4,21 @@ import Game from "../../../src/server/models/Game";
 
 describe('game', () => {
 
-    it('construct', () => {
+    it('construct', (done) => {
         let game = new Game("1", "johndoe");
         expect(game != null);
+        done();
     });
 
-    it('pieces', () => {
+    it('pieces', (done) => {
         let game = new Game("1", "johndoe");
         game.addPieces(2);
         game.fetchPieces(0);
         expect(game.fetchPieces(15) == null);
+        done();
     });
 
-    it('players', () => {
+    it('players', (done) => {
         let socket = new SocketMock();
         socket.join("myroom");
         let game = new Game("myroom", "johndoe");
@@ -27,11 +29,15 @@ describe('game', () => {
         expect(game.getPlayerList().length == 2);
         game.deletePlayer("johnfrancis");
         game.deletePlayer("johndoe");
+        expect(game.getPlayerList().length == 0);
+        done();
     });
 
-    it('infos', () => {
+    it('infos', (done) => {
         let game = new Game("3", "johndoe");
         game.setInterval(1);
         game.setInterval(0);
+        expect(game.interval == 1);
+        done();
     });
 });
