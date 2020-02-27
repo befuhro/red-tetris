@@ -2,7 +2,7 @@ export const getCompleteLines = (board) => {
     let lines = [];
     for (let i = 0; i < 20; i++) {
         for (let j = 0; j < 10; j++) {
-            if (board[i * 10 + j].color === 'white') break;
+            if (board[i * 10 + j].color === 'white' || board[i * 10 + j].color === 'realwhite') break;
             if (j === 9) lines.push(i);
         }
     }

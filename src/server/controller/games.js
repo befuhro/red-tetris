@@ -107,9 +107,15 @@ function connectPlayer(socket, data) {
     /*
     ** Called when a player completes a line, locks the line to every sother player
     */
-    socket.on('line lock', (lineno, callback) => {
+    socket.on('line lock', lineno => {
         socket.broadcast.to(data.room).emit("line lock", lineno);
-        callback();
+        console.log(lineno);
+    });
+
+
+    socket.on('update spectrum', spectrum => {
+        games[data.room].players[data.username].updateSpectrum(spectrum);
+        console.log(data.username, spectrum);
     });
 
     /*

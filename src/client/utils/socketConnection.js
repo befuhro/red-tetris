@@ -10,7 +10,10 @@ export const roomConnection = (socket, dispatch) => {
         dispatch(updateRoom(data.players, data.leaderName));
     });
 
-    socket.on('new spectrum', (data) => dispatch(updateSpectrum(data.username, data.spectrum)));
+    socket.on('new spectrum', (data) => {
+        console.log('Spectrum', data);
+        dispatch(updateSpectrum(data.username, data.spectrum))
+    });
 
     socket.on('update interval', (value) => {
         dispatch(changeInterval(value));

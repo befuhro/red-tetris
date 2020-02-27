@@ -1,20 +1,18 @@
 import clone from "lodash/clone";
-import { CHECK_AVAILABILITY_FAILURE, DELETE_ERRORS, DISPLAY_ERROR} from "../../actions/env";
+import { CHECK_AVAILABILITY_FAILURE, DELETE_ERRORS} from "../../actions/env";
 
-const initialState = () => ({
+export const initialState = () => ({
     errors: null,
 });
 
 function checkAvailabilityFailure(state, action) {
     let newState = clone(state);
-
     newState.errors = action.errors;
     return (newState);
 }
 
 function deleteErrors(state) {
     let newState = clone(state);
-
     newState.errors = null;
     return (newState);
 }
