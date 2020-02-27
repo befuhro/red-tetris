@@ -128,3 +128,6 @@ export const displayError = error => ({type: DISPLAY_ERROR, error: error});
 
 export const CLEAR_ERROR = 'CLEAR_ERROR';
 export const clearError = () => ({type: CLEAR_ERROR});
+
+export const ADD_LINES = 'ADD_LINES';
+export const addLines = (numberOfLines) => ({type: ADD_LINES, numberOfLines: numberOfLines});
