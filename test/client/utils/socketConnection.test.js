@@ -14,11 +14,13 @@ describe('socket', () => {
         done();
     });
 
-// server.listen(808\ww0);
-
     it('opponent connection', done => {
         roomConnection(socketClient, data => {
-            if (data.type === 'CHANGE_INTERVAL') done();
+            if (data.type === 'CHANGE_INTERVAL') {
+                socketClient.disconnect();
+                server.close();
+                done();
+            }
         });
 
         room.on('connect', socketServer => {
