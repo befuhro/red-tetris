@@ -137,7 +137,7 @@ describe('get piece action', () => {
     it('should return get piece', () => {
         const state = {
             board: cloneDeep(board),
-            current: undefined,
+            current: null,
             pieces: [],
             indexPieces: 0,
             socket: socket
@@ -152,15 +152,15 @@ describe('get piece action', () => {
     it('should return same board with empty lines', () => {
         const state = {
             board: addFullLines(board, [1, 5, 9, 12]),
-            current: undefined,
-            pieces: ['piece'],
+            current: null,
+            pieces: [],
             indexPieces: 0,
             socket: socket
         };
         expect(reducer(state, getPiece())).toMatchObject({
             ...state,
             board: cloneDeep(board),
-            current: 'piece',
+            current: null,
             indexPieces: state.indexPieces + 1
         });
     });

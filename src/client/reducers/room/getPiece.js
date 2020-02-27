@@ -40,7 +40,6 @@ const endParty = socket => {
 };
 
 export const getPiece = (state) => {
-    const piece = state.pieces[0];
     let newState = clone(state);
     newState.board = putCurrentToBoard(state.board, state.current);
     // Remove complete lines
@@ -50,7 +49,7 @@ export const getPiece = (state) => {
     }
     newState.pieces.shift();
     newState.indexPieces++;
-    newState.current = piece;
+    newState.current = state.pieces[0] ? state.pieces[0] : null;
     if (checkEndParty(newState.board, newState.current)) endParty(newState.socket);
     updateSpectrum(newState.socket, newState.board);
     return (newState);
