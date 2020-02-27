@@ -8,6 +8,7 @@ import {
     MOVE_PIECE,
     ROTATE_PIECE,
     UPDATE_ROOM,
+    GAME_START,
     CHANGE_INTERVAL
 } from "../../actions/room";
 
@@ -19,6 +20,7 @@ import {rotatePiece} from "./rotatePiece";
 import {fetchPieces} from "./fetchPieces";
 import {updateSpectrum} from "./spectrum";
 import {changeInterval} from "./changeInterval";
+import {gameStart} from "./gameStart";
 
 export const initialState = () => ({
     board: Array(200).fill({color: "white"}).map((square, index) => (
@@ -58,6 +60,8 @@ export default (state = initialState(), action) => {
             return (updateSpectrum(state, action));
         case CHANGE_INTERVAL:
             return (changeInterval(state, action));
+        case GAME_START:
+            return (gameStart(state));
         default:
             return state;
     }

@@ -20,8 +20,10 @@ function connectPlayer(socket, data) {
 
     // Handle pieces fetching
     socket.on('fetch pieces', (from, callback) => {
-        if (games[data.room].players[data.username].ended)
+        if (games[data.room].players[data.username].ended) {
             if (callback) callback({pieces: [], message: "player has lost"});
+            return;
+        }
         console.log('fetching pieces from ' + from);
         if (callback) callback({pieces: games[data.room].fetchPieces(from)});
     });
@@ -154,14 +156,6 @@ function connectPlayer(socket, data) {
 		if (callback) callback({score: score, ended: false});
     });
 
-    /*
-     * Fires when the player can't play anymore (piece is out of board)
-     * Might emit to other players as well
-    */
-    socket.on('player ended', (callback) => {
-        games[data.room].players[data.username].ended = true;
-        if (callback) callback({end: true, score: game[data.room].players[data.username].score});
-    });
 
     // Broadcast when a opponent joins the room.
     socket.broadcast.to(data.room).emit('opponent connection', {

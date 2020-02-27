@@ -116,3 +116,6 @@ export const startPartySuccess = () => ({ type: START_PARTY_SUCCESS });
 
 export const START_PARTY_FAILURE = "START_PARTY_FAILURE";
 export const startPartyFailure = () => ({ type: START_PARTY_FAILURE });
+
+export const GAME_START = 'GAME_START';
+export const gameStart = () => ({type: GAME_START});

@@ -23,6 +23,20 @@ const updateSpectrum = (socket, board) => {
     });
 };
 
+const checkEndParty = (board, piece) => {
+    let finished = false;
+    piece.position.forEach(bloc => {
+        if (board[bloc.column + (bloc.row * 10)].color !== 'white') {
+            finished = true;
+        }
+    });
+    return finished;
+};
+
+const endParty = (socket, username) => {
+    socket.emit('player ended', {username: username}, (data) => console.log(data));
+};
+
 export const getPiece = (state) => {
     const piece = state.pieces[0];
     let newState = clone(state);
@@ -35,6 +49,7 @@ export const getPiece = (state) => {
     newState.pieces.shift();
     newState.indexPieces++;
     newState.current = piece;
+    if (checkEndParty(newState.board, newState.current)) endParty(newState.socket, newState.username);
     updateSpectrum(newState.socket, newState.board);
     return (newState);
 };
