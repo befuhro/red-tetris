@@ -21,21 +21,21 @@ function connectPlayer(socket, data) {
     // Handle pieces fetching
     socket.on('fetch pieces', (from, callback) => {
         if (games[data.room].players[data.username].ended)
-            callback({pieces: [], message: "player has lost"});
+            if (callback) callback({pieces: [], message: "player has lost"});
         console.log('fetching pieces from ' + from);
-        callback({pieces: games[data.room].fetchPieces(from)});
+        if (callback) callback({pieces: games[data.room].fetchPieces(from)});
     });
 
     // Handle party launching
     socket.on('start party', (callback) => {
-        if (socket.id === Object.values(games[data.room].players)[0].socket.id) {
+        if (socket.id === Object.values(games[data.room].players)[0].socket.id && !games[data.room].gameIsStarted) {
             console.log('game of room ' + data.room + ' has now started');
             games[data.room].gameIsStarted = true;
-            callback({authorizedToLaunchParty: true});
-            socket.to(data.room).emit('launch party');
+            if (callback) callback({authorizedToLaunchParty: true});
+            socket.broadcast.to(data.room).emit('launch party');
         } else {
             console.log('could not launch game of room ' + data.room);
-            callback({authorizedToLaunchParty: false});
+            if (callback) callback({authorizedToLaunchParty: false});
         }
     });
 
@@ -43,15 +43,15 @@ function connectPlayer(socket, data) {
 	 * Set a game mode, 'normal', 'sudden death'
 	*/
 	socket.on('mode set', (mode, callback) => {
-        if (socket.id === Object.values(games[data.room].players)[0].socket.id) {
+        if (socket.id === Object.values(games[data.room].players)[0].socket.id && !games[data.room].gameIsStarted) {
 			if (Object.keys(games[data.room].players).length < 2) {
-				callback({authorized: true, error: 'The room needs at least 2 players'});
+				if (callback) callback({authorized: true, error: 'The room needs at least 2 players'});
 				return;
 			}
 			games[data.room].mode = mode;
-			callback({authorized: true});
+			if (callback) callback({authorized: true});
 		} else {
-			callback({authorized: false, error: 'You are not the party leader'});
+			if (callback) callback({authorized: false, error: 'Could not set the mode'});
 		}
 	});
 
@@ -59,29 +59,28 @@ function connectPlayer(socket, data) {
 	 * Broadcast to all room
 	*/
 	socket.on('broadcast send', (data, callback) => {
-		socket.to(data.room).emit('broadcast received', data);
-		callback(data);
+		socket.broadcast.to(data.room).emit('broadcast received', data);
+		if (callback) callback(data);
 	});
-
 
 	/*
 	 * Gets if a player has lost, if no player left set the game as over
 	*/
     socket.on('player ended', (callback) => {
         games[data.room].players[data.username].ended = true;
-        isgameover = true;
-        console.log(username + " has ended");
-        socket.to(data.room).emit('player ended', data.username);
-        Object.values(game[data.room].players).forEach((player) => {
+        let isgameover = true;
+        console.log(data.username + " has ended");
+        socket.broadcast.to(data.room).emit('player ended', data.username);
+        Object.values(games[data.room].players).forEach((player) => {
             if (player.ended === false) {
                 isgameover = false;
             }
         });
         console.log("game " + data.room + " is over");
         if (isgameover) {
-            socket.to(data.room).emit("game over");
+            socket.broadcast.to(data.room).emit("game over");
         }
-        callback({ gameover: isgameover });
+        if (callback) callback({ gameover: isgameover });
     });
 
     /*
@@ -95,11 +94,11 @@ function connectPlayer(socket, data) {
 
             // did not work
             // callback({interval: games[data.room].interval});
-            callback({interval: value});
-            socket.to(data.room).emit('update interval', value);
+            if (callback) callback({interval: value});
+            socket.broadcast.to(data.room).emit('update interval', value);
         } else {
             console.log("Interval update unauthorized");
-            callback({error: 'unauthorized', interval: games[data.room].interval});
+            if (callback) callback({error: 'unauthorized', interval: games[data.room].interval});
         }
     });
 
@@ -109,7 +108,7 @@ function connectPlayer(socket, data) {
     socket.on('piece placed', (spectrum, callback) => {
         let score = 0;
 		games[data.room].players[data.username].updateSpectrum(spectrum);
-		games[data.room].players[data.username].pieces_placed++;
+        games[data.room].players[data.username].pieces_placed++;
         if (games[data.room].mode == 'normal') {
 			score = games[data.room].players[data.username].score++;
 		}
@@ -122,11 +121,11 @@ function connectPlayer(socket, data) {
 				}
 			});
 			if (games[data.room].players[data.username].pieces_placed == 30) {
-				callback({score: score, ended: false, message: 'Wave ended, waiting for other players...'});
+				if (callback) callback({score: score, ended: false, message: 'Wave ended, waiting for other players...'});
 				return;
 			}
 			let new_wave = true;
-			Object.values(game[data.room].players).forEach((player) => {
+			Object.values(games[data.room].players).forEach((player) => {
 				if (player.pieces_placed != 30) {
 					new_wave = false;
 				}
@@ -141,19 +140,18 @@ function connectPlayer(socket, data) {
 				if (worst_user.user === data.username) {
 					games[data.room].players[data.username].ended = true;
 					console.log("Player " + player.username + " is eliminated");
-                    callback({ score: score, ended: true, message: 'Wave ended, you got left begin and are now disqualified...' });
+                    if (callback) callback({ score: score, ended: true, message: 'Wave ended, you got left begin and are now disqualified...' });
 				}
                 Object.keys(games[data.room].players).forEach((player_id) => {
                     games[data.room].players[player_id].pieces_placed = 0;
                 });
 			}
 		}
-        console.log("piece placed", games[data.room].Pieces.length, 10 + games[data.room].players[data.username].pieces_placed);
         if (games[data.room].Pieces.length < (10 + games[data.room].players[data.username].pieces_placed)) {
             let piece = games[data.room].Pieces.length;
             games[data.room].addPieces(10);
         }
-		callback({score: score, ended: false});
+		if (callback) callback({score: score, ended: false});
     });
 
     /*
@@ -161,12 +159,12 @@ function connectPlayer(socket, data) {
      * Might emit to other players as well
     */
     socket.on('player ended', (callback) => {
-        game[data.room].players[data.username].ended = true;
-        callback({end: true, score: game[data.room].players[data.username].score});
+        games[data.room].players[data.username].ended = true;
+        if (callback) callback({end: true, score: game[data.room].players[data.username].score});
     });
 
     // Broadcast when a opponent joins the room.
-    socket.to(data.room).emit('opponent connection', {
+    socket.broadcast.to(data.room).emit('opponent connection', {
         players: games[data.room].getPlayersInfo(),
         leaderName: games[data.room].leaderName
     });
@@ -199,9 +197,9 @@ function checkAvailability(username, room) {
         if (Object.keys(games[room].players).length >= 4) {
             authData['reasons'].push({message: 'The room is full.', id: 2});
         }
-        if (authData['reasons'].length === 0) {
-            authData['reasons'].push({message: 'Reason unknown.', id: 3});
-        }
+        // if (authData['reasons'].length === 0) {
+        //     authData['reasons'].push({message: 'Reason unknown.', id: 3});
+        // }
     }
     return (authData);
 }
@@ -210,17 +208,15 @@ function handleRoomConnection(socket) {
     // User check for username and room availability.
     socket.on('check availability', (data, callback) => {
         const authData = checkAvailability(data.username, data.room);
-        // callback(authData);
+        if (callback) callback(authData);
         if (authData['canConnect'] === false) {
-            callback(authData);
-            socket.disconnect();
+            if (callback) callback(authData);
         }
-        callback(authData);
+        if (callback) callback(authData);
     });
 
     // User try to join room.
     socket.on('join room', (data, callback) => {
-        // tryToConnect(socket, data, callback)
         const authData = checkAvailability(data.username, data.room);
         if (authData['canConnect'] === true) {
             let authData = {connected: true};
@@ -231,10 +227,9 @@ function handleRoomConnection(socket) {
                 authData = {...authData, ...{players: games[data.room].getPlayersInfo(), isRoomLeader: false}};
             }
             connectPlayer(socket, data);
-            callback(authData);
+            if (callback) callback(authData);
         } else {
-            callback({isConnected: false, reasons: authData['reasons']});
-            socket.disconnect();
+            if (callback) callback({isConnected: false, reasons: authData['reasons']});
         }
     });
 }

@@ -13,11 +13,8 @@ class Player {
     }
 
     updateSpectrum(spectrum) {
-        console.log('Username: ', this.username);
-        console.log('New spectrum: ');
-        console.log(spectrum);
         this.spectrum = spectrum;
-        this.socket.to(this.room).emit('new spectrum', {username: this.username, spectrum: spectrum});
+        this.socket.broadcast.to(this.room).emit('new spectrum', {username: this.username, spectrum: spectrum});
     }
 }
 
