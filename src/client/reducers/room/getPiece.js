@@ -33,8 +33,8 @@ const checkEndParty = (board, piece) => {
     return finished;
 };
 
-const endParty = (socket, username) => {
-    socket.emit('player ended', {username: username}, (data) => console.log(data));
+const endParty = socket => {
+    socket.emit('player ended', (data) => console.log(data));
 };
 
 export const getPiece = (state) => {
@@ -49,7 +49,7 @@ export const getPiece = (state) => {
     newState.pieces.shift();
     newState.indexPieces++;
     newState.current = piece;
-    if (checkEndParty(newState.board, newState.current)) endParty(newState.socket, newState.username);
+    if (checkEndParty(newState.board, newState.current)) endParty(newState.socket);
     updateSpectrum(newState.socket, newState.board);
     return (newState);
 };
