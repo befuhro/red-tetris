@@ -105,6 +105,14 @@ function connectPlayer(socket, data) {
     });
 
     /*
+    ** Called when a player completes a line, locks the line to every sother player
+    */
+    socket.on('line lock', (lineno, callback) => {
+        socket.broadcast.to(data.room).emit("line lock", lineno);
+        callback();
+    });
+
+    /*
     * Fires when a piece has been placed, add pieces when there is not enough
     */
     socket.on('piece placed', (spectrum, callback) => {
@@ -155,7 +163,6 @@ function connectPlayer(socket, data) {
         }
 		if (callback) callback({score: score, ended: false});
     });
-
 
     // Broadcast when a opponent joins the room.
     socket.broadcast.to(data.room).emit('opponent connection', {
