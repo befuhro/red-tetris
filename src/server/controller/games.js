@@ -28,7 +28,7 @@ function connectPlayer(socket, data) {
 
     // Handle party launching
     socket.on('start party', (callback) => {
-        if (socket.id === Object.values(games[data.room].players)[0].socket.id) {
+        if (socket.id === Object.values(games[data.room].players)[0].socket.id && !games[data.room].gameIsStarted) {
             console.log('game of room ' + data.room + ' has now started');
             games[data.room].gameIsStarted = true;
             if (callback) callback({authorizedToLaunchParty: true});
@@ -43,7 +43,7 @@ function connectPlayer(socket, data) {
 	 * Set a game mode, 'normal', 'sudden death'
 	*/
 	socket.on('mode set', (mode, callback) => {
-        if (socket.id === Object.values(games[data.room].players)[0].socket.id) {
+        if (socket.id === Object.values(games[data.room].players)[0].socket.id && !games[data.room].gameIsStarted) {
 			if (Object.keys(games[data.room].players).length < 2) {
 				if (callback) callback({authorized: true, error: 'The room needs at least 2 players'});
 				return;
@@ -51,7 +51,7 @@ function connectPlayer(socket, data) {
 			games[data.room].mode = mode;
 			if (callback) callback({authorized: true});
 		} else {
-			if (callback) callback({authorized: false, error: 'You are not the party leader'});
+			if (callback) callback({authorized: false, error: 'Could not set the mode'});
 		}
 	});
 

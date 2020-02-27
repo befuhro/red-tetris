@@ -1,5 +1,6 @@
-import {handleRoomConnection, connectPlayer} from "../../../src/server/controller/games";
+import {handleRoomConnection} from "../../../src/server/controller/games";
 import SocketMock from 'socket.io-mock';
+import SocketClient from 'socket.io-mock';
 
 describe('games', () => {
 
@@ -21,7 +22,9 @@ describe('games', () => {
 
         socket.socketClient.emit("join room", {room: 'myroom', username: 'player 1'});
         socket.socketClient.emit("check availability", {room: 'myroom', username: 'undefined'});
+
         socket.socketClient.emit("start party");
+
         socket.socketClient.emit("check availability", {room: 'myroom', username: 'jackwhite'});
 
         socket.socketClient.emit("disconnect", "he got bored");
@@ -57,18 +60,22 @@ describe('games', () => {
 
     it('piece placed', (done) => {
         let socket = new SocketMock();
-        let socket2 = new SocketMock();
+        let client2 = new SocketClient();
         handleRoomConnection(socket);
         socket.socketClient.emit("join room", {room: 'pieceroom', username: 'player 1'});
-        socket.socketClient.emit("join room", {room: 'pieceroom', username: 'player 2'});
+        client2.emit("join room", {room: 'pieceroom', username: 'player 2'});
+        socket.socketClient.emit("join room", {room: 'pieceroom', username: 'player 3'});
+        socket.socketClient.emit("mode set", 'sudden death');
+        socket.socketClient.emit("start party");
         let spectrum = [];
         for (let i = 0; i < 20; i++) {
             spectrum[i] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
         }
-        socket.socketClient.emit("piece placed", spectrum);
-        socket.socketClient.emit("mode set", 'sudden death');
-        for (let i = 0; i < 50; ++i) {
+        for (let i = 0; i < 31; ++i) {
             socket.socketClient.emit("piece placed", spectrum);
+        }
+        for (let i = 0; i < 31; ++i) {
+            client2.emit("piece placed", spectrum);
         }
         done();
     });
