@@ -29,7 +29,6 @@ const rotatePieceMiddleware = store => next => action => {
             else if (error.type === ALREADY_TAKEN) {
                 next(movePiece(TOP));
             }
-            rotatePieceMiddleware(store)(next)(action);
         }
     }
     else {
